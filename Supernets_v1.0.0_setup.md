@@ -28,9 +28,22 @@ go build -o polygon-edge .
 ./polygon-edge polybft-secrets --data-dir test-chain- --num 4 --insecure
 ```
 
-## 3. Initialize genesis file with allowlisting, premining, and native token config
+## 3. Initialize genesis file with allowlisting / blocklisting, premining, and native token config
+To allowlist specific addresses to make transactions to your Supernet, you can use the `--transactions-allow-list-admin` flag to specify the allowlist admins and `--transactions-allow-list-enabled` flag to list the allowed addresses.
+
+To blocklist specific addresses from making transactions to your Supernet, you can use the `--transactions-block-list-admin` flag to specify the blocklist admins and `--transactions-block-list-enabled` flag to list the blocked addresses.
 ```
-./polygon-edge genesis --block-gas-limit 10000000 --epoch-size 10 --validators-path ./ --validators-prefix test-chain- --consensus polybft --reward-wallet <your_wallet_address_here>:1000000 --transactions-allow-list-admin <your_wallet_address_here> --transactions-allow-list-enabled <your_wallet_address_here> --premine <your_wallet_address_here>:100000000000000000000 --native-token-config "SuperETH:SETH:18:true"
+./polygon-edge genesis /
+--block-gas-limit 10000000 /
+--epoch-size 10 /
+--validators-path ./ /
+--validators-prefix test-chain- /
+--consensus polybft /
+--reward-wallet <your_wallet_address_here>:1000000 /
+[--transactions-allow-list-admin <allow_list_admin_addresses_here> --transactions-allow-list-enabled <allowed_addresses_here>] /
+[--transactions-block-list-admin <block_list_admin_addresses_here> --transactions-block-list-enabled <blocked_addresses_here>] /
+--premine <your_wallet_address_here>:100000000000000000000 /
+--native-token-config "SuperETH:SETH:18:true"
 ```
 
 ## 4. Deploy StakeManager contract to Rootchain
