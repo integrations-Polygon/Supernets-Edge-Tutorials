@@ -32,6 +32,8 @@ go build -o polygon-edge .
 To allowlist specific addresses to make transactions to your Supernet, you can use the `--transactions-allow-list-admin` flag to specify the allowlist admins and `--transactions-allow-list-enabled` flag to list the allowed addresses.
 
 To blocklist specific addresses from making transactions to your Supernet, you can use the `--transactions-block-list-admin` flag to specify the blocklist admins and `--transactions-block-list-enabled` flag to list the blocked addresses.
+
+The `--native-token-config` file sets the attributes of the native token of the Supernet. In case the minting flag inside the native token config is set to `true` inside the config, the minter's address needs to be supplied at the end.
 ```
 ./polygon-edge genesis /
 --block-gas-limit 10000000 /
@@ -43,7 +45,7 @@ To blocklist specific addresses from making transactions to your Supernet, you c
 [--transactions-allow-list-admin <allow_list_admin_addresses_here> --transactions-allow-list-enabled <allowed_addresses_here>] /
 [--transactions-block-list-admin <block_list_admin_addresses_here> --transactions-block-list-enabled <blocked_addresses_here>] /
 --premine <your_wallet_address_here>:100000000000000000000 /
---native-token-config "SuperETH:SETH:18:true"
+--native-token-config "SuperETH:SETH:18:true:<native_token_minter_address>"
 ```
 
 ## 4. Deploy StakeManager contract to Rootchain
