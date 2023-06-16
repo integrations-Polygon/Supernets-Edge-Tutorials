@@ -1,7 +1,7 @@
 # Setup Polygon Supernets v1.0.0 on Ubuntu 22
-Last Updated: Jun 8, 2023
+Last Updated: Jun 16, 2023
 Release Version: 1.0.0
-Subrelease Version: Commit 67d49707eaef51bcfe4d0b89a341a8e310b90e93
+Subrelease Version: Commit a736a9c
 
 ## Prequisites:
 - Golang 1.19
@@ -33,17 +33,28 @@ To allowlist specific addresses to make transactions to your Supernet, you can u
 
 To blocklist specific addresses from making transactions to your Supernet, you can use the `--transactions-block-list-admin` flag to specify the blocklist admins and `--transactions-block-list-enabled` flag to list the blocked addresses.
 
+
+*Note*: It is recommended to either use an allowlist or blocklist at a time. Using both or neither will cause unforeseen issues. The same holds true for the `--contract-deployer-allow-list-admin`,`--contract-deployer-allow-list-enabled`,`--contract-deployer-block-list-admin`,`--contract-deployer-block-list-enabled`,`--bridge-allow-list-admin`,`--bridge-allow-list-enabled`,`--bridge-block-list-admin`,`--bridge-block-list-enabled` flags.
+
 The `--native-token-config` file sets the attributes of the native token of the Supernet. In case the minting flag inside the native token config is set to `true` inside the config, the minter's address needs to be supplied at the end.
 ```
 ./polygon-edge genesis /
---block-gas-limit 10000000 /
+--block-gas-limit 10000000 --block-time 6s /
 --epoch-size 10 /
 --validators-path ./ /
 --validators-prefix test-chain- /
 --consensus polybft /
 --reward-wallet <your_wallet_address_here>:1000000 /
-[--transactions-allow-list-admin <allow_list_admin_addresses_here> --transactions-allow-list-enabled <allowed_addresses_here>] /
-[--transactions-block-list-admin <block_list_admin_addresses_here> --transactions-block-list-enabled <blocked_addresses_here>] /
+
+[--transactions-allow-list-admin <transactions_allow_list_admin_addresses_here> --transactions-allow-list-enabled <transactions_allowed_addresses_here>] /
+[--transactions-block-list-admin <transactions_block_list_admin_addresses_here> --transactions-block-list-enabled <transactions_blocked_addresses_here>] /
+
+[--contract-deployer-allow-list-admin <contract_deployer_allow_list_admin_here> --contract-deployer-allow-list-enabled <contract_deployer_allowed_addresses_here>] /
+[--contract-deployer-block-list-admin <contract_deployer_block_list_admin_here> --contract-deployer-block-list-enabled <contract_deployer_blocked_addresses_here>] /
+
+[--bridge-allow-list-admin <bridge_allow_list_admin_addresses_here> --bridge-allow-list-enabled <bridge_allowed_addresses_here>] /
+[--bridge-block-list-admin <bridge_block_list_admin_addresses_here> --bridge-block-list-enabled <bridge_blocked_addresses_here>] /
+
 --premine <your_wallet_address_here>:100000000000000000000 /
 --native-token-config "SuperETH:SETH:18:true:<native_token_minter_address>"
 ```
