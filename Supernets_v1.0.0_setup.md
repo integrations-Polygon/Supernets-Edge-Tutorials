@@ -1,7 +1,7 @@
 # Setup Polygon Supernets v1.0.0 on Ubuntu 22
-Last Updated: Jun 16, 2023
+Last Updated: Jun 20, 2023
 Release Version: 1.0.0
-Subrelease Version: Commit a736a9c
+Subrelease Version: Commit de084a9
 
 ## Prequisites:
 - Golang 1.19
@@ -77,9 +77,9 @@ This command deploys rootchain smart contracts and initializes them. It also upd
 ```
 
 ## 6. Fund validators on Rootchain
-in order for validators to be able to send transactions to Ethereum, they need to be funded in order to be able to cover gas cost. This command is for testing purposes only. The `mint` flag indicates if the state token deployer should mint root tokens to the given validators.
+in order for validators to be able to send transactions to Ethereum, they need to be funded in order to be able to cover gas cost. This command is for testing purposes only.
 ```
- ./polygon-edge rootchain fund --addresses <validator_addresses_here> --amounts <funding_amounts_here> --json-rpc <rootchain_rpc_here> --private-key <your_hex_encoded_private_key_here> --mint
+ ./polygon-edge rootchain fund --addresses <validator_addresses_here> --amounts <funding_amounts_here> --json-rpc <rootchain_rpc_here> --private-key <your_hex_encoded_private_key_here>
 ```
 
 ## 7. Whitelist validators on Rootchain
