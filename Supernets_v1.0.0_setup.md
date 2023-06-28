@@ -29,12 +29,15 @@ go build -o polygon-edge .
 ```
 
 ## 3. Initialize Shell Variables
-This will allow you to refer the same set of variables for the next commands. Note that closing the terminal resets the shell variables. Ideally the Deployer Address should be funded with sufficient native tokens on the rootchain to cover for gas costs. The Rootchain Stake Token is an ERC20 that's deployed on the rootchain.
+This will allow you to refer the same set of variables for the next commands. Note that closing the terminal resets the shell variables. Ideally the Deployer Address should be funded with sufficient native tokens on the rootchain to cover for gas costs. 
+- The Rootchain Stake Token is an ERC20 that's deployed on the rootchain. This token is used by validators for staking.
+- The Rootchain Parent Token is a mintable ERC20 that's deployed on the rootchain with 0 circulating supply. This token is mapped to the native token on the Supernet.
 ```
 DEPLOYER_ADDRESS=<deployer wallet address>
 DEPLOYER_KEY=<hex encoded deployer key>
 ROOTCHAIN_RPC=<rootchain_rpc_here>
 ROOTCHAIN_STAKE_TOKEN=<stake_token_address_here>
+ROOTCHAIN_PARENT_TOKEN=<rootchain_parent_address_here>
 ```
 
 ## 4. Initialize genesis file with allowlisting / blocklisting, premining, and native token config
@@ -51,8 +54,8 @@ The `--native-token-config` file sets the attributes of the native token of the 
 --block-gas-limit 10000000 /
 --block-time 6s /
 --chain-id 7567 --consensus polybft /
---epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:true:$DEPLOYER_ADDRESS" /
---premine  $DEPLOYER_ADDRESS:100000000000000000000 --reward-wallet $DEPLOYER_ADDRESS:1000000 /
+--epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:false" /
+--reward-wallet $DEPLOYER_ADDRESS:1000000 /
 --validators-path ./ --validators-prefix test-chain- /
 --bridge-allow-list-admin $DEPLOYER_ADDRESS --bridge-allow-list-enabled $DEPLOYER_ADDRESS /
 --contract-deployer-allow-list-admin $DEPLOYER_ADDRESS --contract-deployer-allow-list-enabled $DEPLOYER_ADDRESS /
@@ -76,7 +79,7 @@ STAKE_MANAGER=$(jq -r '.params.engine.polybft.bridge.stakeManagerAddr' "genesis.
 ## 6. Deploy and initialize Rootchain contracts
 This command deploys rootchain smart contracts and initializes them. It also updates `genesis.json` with rootchain contract addresses and rootchain default sender address.
 ```
-./polygon-edge rootchain deploy --deployer-key $DEPLOYER_KEY --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --genesis ./genesis.json $ROOTCHAIN_RPC
+./polygon-edge rootchain deploy --deployer-key $DEPLOYER_KEY --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --genesis ./genesis.json --erc20-token $ROOTCHAIN_PARENT_TOKEN --json-rpc $ROOTCHAIN_RPC
 ```
 
 ## 7. Fund validators on Rootchain
