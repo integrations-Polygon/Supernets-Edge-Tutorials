@@ -4,7 +4,7 @@ This tutorial assumes PolyBFT consensus
 
 ## Prerequisites:
 - Docker & docker-compose [[Installation instructions](https://github.com/integrations-Polygon/Supernets-Edge-Tutorials/blob/master/Install_Docker.md)]
-- Hardware Requirements
+- [Hardware Requirements](https://wiki.polygon.technology/docs/supernets/operate/supernets-requirements)
 
 ## 1. Clone Repository
 ```
