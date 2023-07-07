@@ -1,7 +1,7 @@
 # Setup Polygon Supernets v1.0.0 on Ubuntu 22
-Last Updated: Jun 28, 2023
+Last Updated: Jul 7, 2023
 Release Version: 1.0.0
-Subrelease Version: Commit 36fa7a6
+Subrelease Version: Commit 6e5cd75
 
 ## Prequisites:
 - Golang 1.20
@@ -55,7 +55,8 @@ The `--native-token-config` file sets the attributes of the native token of the 
 --block-time 6s /
 --chain-id 7567 --consensus polybft /
 --epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:false" /
---reward-wallet $DEPLOYER_ADDRESS:1000000 /
+--reward-wallet $DEPLOYER_ADDRESS:100000000000000000000 /
+--premine 0x0:100000000000000000000 /
 --validators-path ./ --validators-prefix test-chain- /
 --bridge-allow-list-admin $DEPLOYER_ADDRESS --bridge-allow-list-enabled $DEPLOYER_ADDRESS /
 --contract-deployer-allow-list-admin $DEPLOYER_ADDRESS --contract-deployer-allow-list-enabled $DEPLOYER_ADDRESS /
