@@ -156,3 +156,9 @@ In this example our chain chain cluster consists of 4 Edge clients. You can use 
 ```
 ./polygon-edge server --data-dir ./test-chain-4 --chain genesis.json --grpc-address :5004 --libp2p :30304 --jsonrpc :10004 --seal --log-level DEBUG --relayer
 ```
+
+
+## The following error message is received upon initialising the nodes:
+```
+Error writing genesis block: RewardToken.approve contract call was reverted: ERC20: approve from the zero address
+```
