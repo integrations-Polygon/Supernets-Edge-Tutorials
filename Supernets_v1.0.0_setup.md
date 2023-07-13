@@ -30,14 +30,12 @@ go build -o polygon-edge .
 
 ## 3. Initialize Shell Variables
 This will allow you to refer the same set of variables for the next commands. Note that closing the terminal resets the shell variables. Ideally the Deployer Address should be funded with sufficient native tokens on the rootchain to cover for gas costs. 
-- The Rootchain Stake Token is an ERC20 that's deployed on the rootchain. This token is used by validators for staking.
-- The Rootchain Parent Token is a mintable ERC20 that's deployed on the rootchain with 0 circulating supply. This token is mapped to the native token on the Supernet.
+The Rootchain Stake Token is an ERC20 that's deployed on the rootchain. This token is used by validators for staking.
 ```
 DEPLOYER_ADDRESS=<deployer wallet address>
 DEPLOYER_KEY=<hex encoded deployer key>
 ROOTCHAIN_RPC=<rootchain_rpc_here>
 ROOTCHAIN_STAKE_TOKEN=<stake_token_address_here>
-ROOTCHAIN_PARENT_TOKEN=<rootchain_parent_address_here>
 ```
 
 ## 4. Initialize genesis file with allowlisting / blocklisting, premining, and native token config
@@ -45,22 +43,20 @@ To allowlist specific addresses to make transactions to your Supernet, you can u
 
 To blocklist specific addresses from making transactions to your Supernet, you can use the `--transactions-block-list-admin` flag to specify the blocklist admins and `--transactions-block-list-enabled` flag to list the blocked addresses.
 
-
 *Note*: It is recommended to either use an allowlist or blocklist at a time. Using both or neither will cause unforeseen issues. The same holds true for the `--contract-deployer-allow-list-admin`,`--contract-deployer-allow-list-enabled`,`--contract-deployer-block-list-admin`,`--contract-deployer-block-list-enabled`,`--bridge-allow-list-admin`,`--bridge-allow-list-enabled`,`--bridge-block-list-admin`,`--bridge-block-list-enabled` flags.
 
 The `--native-token-config` file sets the attributes of the native token of the Supernet. In case the minting flag inside the native token config is set to `true` inside the config, the minter's address needs to be supplied at the end.
 ```
 ./polygon-edge genesis /
---block-gas-limit 10000000 /
---block-time 6s /
---chain-id 7567 --consensus polybft /
---epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:false" /
---reward-wallet $DEPLOYER_ADDRESS:100000000000000000000 /
---premine 0x0:100000000000000000000 /
---validators-path ./ --validators-prefix test-chain- /
---bridge-allow-list-admin $DEPLOYER_ADDRESS --bridge-allow-list-enabled $DEPLOYER_ADDRESS /
---contract-deployer-allow-list-admin $DEPLOYER_ADDRESS --contract-deployer-allow-list-enabled $DEPLOYER_ADDRESS /
---transactions-allow-list-admin $DEPLOYER_ADDRESS --transactions-allow-list-enabled $DEPLOYER_ADDRESS 
+    --block-gas-limit 10000000 --block-time 6s /
+    --chain-id 7567 --consensus polybft --epoch-size 10 /
+    --name my_supernet --native-token-config "SuperETH:SETH:18:false" /
+    --reward-wallet $DEPLOYER_ADDRESS:1000000 /
+    --premine 0x0:100000000000000000000 --premine $DEPLOYER_ADDRESS:100000000000000000000 /
+    --validators-path ./ --validators-prefix test-chain- /
+    --bridge-allow-list-admin $DEPLOYER_ADDRESS --bridge-allow-list-enabled $DEPLOYER_ADDRESS /
+    --contract-deployer-allow-list-admin $DEPLOYER_ADDRESS --contract-deployer-allow-list-enabled $DEPLOYER_ADDRESS /
+    --transactions-allow-list-admin $DEPLOYER_ADDRESS --transactions-allow-list-enabled $DEPLOYER_ADDRESS 
 ```
 
 ## 5. Deploy StakeManager contract to Rootchain
@@ -80,7 +76,7 @@ STAKE_MANAGER=$(jq -r '.params.engine.polybft.bridge.stakeManagerAddr' "genesis.
 ## 6. Deploy and initialize Rootchain contracts
 This command deploys rootchain smart contracts and initializes them. It also updates `genesis.json` with rootchain contract addresses and rootchain default sender address.
 ```
-./polygon-edge rootchain deploy --deployer-key $DEPLOYER_KEY --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --genesis ./genesis.json --erc20-token $ROOTCHAIN_PARENT_TOKEN --json-rpc $ROOTCHAIN_RPC
+./polygon-edge rootchain deploy --deployer-key $DEPLOYER_KEY --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --genesis ./genesis.json --json-rpc $ROOTCHAIN_RPC
 ```
 
 ## 7. Fund validators on Rootchain
@@ -91,8 +87,9 @@ VALIDATOR_2=$(jq -r '.params.engine.polybft.initialValidatorSet[1].address' "gen
 VALIDATOR_3=$(jq -r '.params.engine.polybft.initialValidatorSet[2].address' "genesis.json")
 VALIDATOR_4=$(jq -r '.params.engine.polybft.initialValidatorSet[3].address' "genesis.json")
 ```
+**Note**: 0.1ETH of native rootchain tokens will be transferred from the deployer's address to each of the validators. In case you wish to edit the funding amounts, refer the `--amounts` flag 
 ```
-./polygon-edge rootchain fund --addresses $VALIDATOR_1,$VALIDATOR_2,$VALIDATOR_3,$VALIDATOR_4 --amounts <funding_amounts_here> --json-rpc $ROOTCHAIN_RPC --private-key $DEPLOYER_KEY
+./polygon-edge rootchain fund --addresses $VALIDATOR_1,$VALIDATOR_2,$VALIDATOR_3,$VALIDATOR_4 --amounts 100000000000000000,100000000000000000,100000000000000000,100000000000000000 --json-rpc $ROOTCHAIN_RPC --private-key $DEPLOYER_KEY
 ```
 
 ## 8. Whitelist validators on Rootchain
@@ -121,39 +118,40 @@ Each validator registers itself on the rootchain.
 ```
 
 ## 10. Initial Staking on the Rootchain.
-First use your private key to transfer some `Rootchain Staking Tokens` to your validators on the rootchain. After ensuring that the validators are funded with Rootchain Staking Tokens, we can begin staking on the rootchain:
+First use your private key to transfer some `Rootchain Staking Tokens` to your validators on the rootchain. After ensuring that the validators are funded with Rootchain Staking Tokens, we can begin staking on the rootchain.
 ```
 SUPERNET_ID=$(jq -r '.params.engine.polybft.supernetID' "genesis.json")
 ```
+**Note**: 0.1ETH of Rootchain Staking Tokens will be staked from the validator's address. In case you wish to edit the amount, refer the `--amount` flag
 ```
-./polygon-edge polybft stake --data-dir ./test-chain-1 --supernet-id $SUPERNET_ID --amount <stake_amount_here> --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --jsonrpc $ROOTCHAIN_RPC
+./polygon-edge polybft stake --data-dir ./test-chain-1 --supernet-id $SUPERNET_ID --amount 100000000000000000 --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --jsonrpc $ROOTCHAIN_RPC
 
-./polygon-edge polybft stake --data-dir ./test-chain-2 --supernet-id $SUPERNET_ID --amount <stake_amount_here> --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --jsonrpc $ROOTCHAIN_RPC
+./polygon-edge polybft stake --data-dir ./test-chain-2 --supernet-id $SUPERNET_ID --amount 100000000000000000 --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --jsonrpc $ROOTCHAIN_RPC
 
-./polygon-edge polybft stake --data-dir ./test-chain-3 --supernet-id $SUPERNET_ID --amount <stake_amount_here> --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --jsonrpc $ROOTCHAIN_RPC
+./polygon-edge polybft stake --data-dir ./test-chain-3 --supernet-id $SUPERNET_ID --amount 100000000000000000 --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --jsonrpc $ROOTCHAIN_RPC
 
-./polygon-edge polybft stake --data-dir ./test-chain-4 --supernet-id $SUPERNET_ID --amount <stake_amount_here> --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --jsonrpc $ROOTCHAIN_RPC
+./polygon-edge polybft stake --data-dir ./test-chain-4 --supernet-id $SUPERNET_ID --amount 100000000000000000 --stake-manager $STAKE_MANAGER --stake-token $ROOTCHAIN_STAKE_TOKEN --jsonrpc $ROOTCHAIN_RPC
 ```
-The `supernet_id`, `stakeManagerAddr` and `stakeTokenAddr` values can be obtained from the `genesis.json` file.
 
 ## 11. Finalize Genesis Validator set on Rootchain (Supernet Manager) contract.
-This is done after all validators from genesis do initial staking on rootchain, and it's a final step that is required before starting the child chain. 
-
-This needs to be done by the deployer of SupernetManager contract (the user that run the deploy command). He can use either its hex encoded private key, or data-dir flag if he has secerets initialized. 
+This is done after all validators from genesis do initial staking on rootchain, and it's a final step that is required before starting the child chain. This needs to be done by the deployer of SupernetManager contract (the user that run the deploy command).
 
 If enable-staking flag is provided, validators will be able to continue staking on rootchain. If not, genesis validators will not be able update its stake or unstake, nor will newly registered validators after genesis will be able to stake tokens on the rootchain. Enabling of staking can be done through this command, or later after the child chain starts.
 ```
 ./polygon-edge polybft supernet --private-key $DEPLOYER_KEY --genesis ./genesis.json --supernet-manager $SUPERNET_MANAGER --stake-manager $STAKE_MANAGER --finalize-genesis-set --enable-staking --jsonrpc $ROOTCHAIN_RPC
 ```
 
-## 12. Run (child chain) cluster
-In this example our chain chain cluster consists of 4 Edge clients. You can use the `--relayer` flag to run child chain nodes in `relayer` mode. It allows automatic execution of deposit events on behalf of users.
+## 12. Run (child chain) cluster in relayer mode
+In this example our chain chain cluster consists of 4 Edge clients. You can use the `--relayer` flag to run child chain nodes in `relayer` mode. It allows automatic execution of deposit events on behalf of users. Open 4 terminal windows to run each node:
 ```
-./polygon-edge server --data-dir ./test-chain-1 --chain genesis.json --grpc-address :5001 --libp2p :30301 --jsonrpc :9545 --seal --log-level DEBUG [--relayer]
-
-./polygon-edge server --data-dir ./test-chain-2 --chain genesis.json --grpc-address :5002 --libp2p :30302 --jsonrpc :10002 --seal --log-level DEBUG [--relayer]
-
-./polygon-edge server --data-dir ./test-chain-3 --chain genesis.json --grpc-address :5003 --libp2p :30303 --jsonrpc :10003 --seal --log-level DEBUG [--relayer]
-
-./polygon-edge server --data-dir ./test-chain-4 --chain genesis.json --grpc-address :5004 --libp2p :30304 --jsonrpc :10004 --seal --log-level DEBUG [--relayer]
+./polygon-edge server --data-dir ./test-chain-1 --chain genesis.json --grpc-address :5001 --libp2p :30301 --jsonrpc :9545 --seal --log-level DEBUG --relayer
+```
+```
+./polygon-edge server --data-dir ./test-chain-2 --chain genesis.json --grpc-address :5002 --libp2p :30302 --jsonrpc :10002 --seal --log-level DEBUG --relayer
+```
+```
+./polygon-edge server --data-dir ./test-chain-3 --chain genesis.json --grpc-address :5003 --libp2p :30303 --jsonrpc :10003 --seal --log-level DEBUG --relayer
+```
+```
+./polygon-edge server --data-dir ./test-chain-4 --chain genesis.json --grpc-address :5004 --libp2p :30304 --jsonrpc :10004 --seal --log-level DEBUG --relayer
 ```
