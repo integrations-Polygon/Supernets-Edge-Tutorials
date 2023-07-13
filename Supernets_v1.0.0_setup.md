@@ -1,7 +1,7 @@
 # Setup Polygon Supernets v1.0.0 on Ubuntu 22
-Last Updated: Jul 7, 2023
+Last Updated: Jul 13, 2023
 Release Version: 1.0.0
-Subrelease Version: Commit 6e5cd75
+Subrelease Version: Commit affd397
 
 ## Prequisites:
 - Golang 1.20
