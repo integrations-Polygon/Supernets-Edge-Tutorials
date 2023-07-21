@@ -1,7 +1,7 @@
 # Setup Polygon Supernets v1.0.0 on Ubuntu 22
-Last Updated: Jul 13, 2023
-Release Version: 1.0.0
-Subrelease Version: Commit affd397
+Last Updated: Jul 21, 2023
+Release Version: 1.0.1
+Subrelease Version: Commit 72e2c4b
 
 ## Prequisites:
 - Golang 1.20
@@ -50,14 +50,16 @@ The `--native-token-config` file sets the attributes of the native token of the 
 ./polygon-edge genesis /
     --block-gas-limit 10000000 --block-time 6s /
     --chain-id 7567 --consensus polybft --epoch-size 10 /
-    --name my_supernet --native-token-config "SuperETH:SETH:18:false" /
+    --name my_supernet --native-token-config "SuperETH:SETH:18:true:$DEPLOYER_ADDRESS" /
     --reward-wallet $DEPLOYER_ADDRESS:1000000 /
-    --premine 0x0:100000000000000000000 --premine $DEPLOYER_ADDRESS:100000000000000000000 /
+    --premine 0x0:1 --premine $DEPLOYER_ADDRESS:100000000000000000000 /
     --validators-path ./ --validators-prefix test-chain- /
     --bridge-allow-list-admin $DEPLOYER_ADDRESS --bridge-allow-list-enabled $DEPLOYER_ADDRESS /
     --contract-deployer-allow-list-admin $DEPLOYER_ADDRESS --contract-deployer-allow-list-enabled $DEPLOYER_ADDRESS /
     --transactions-allow-list-admin $DEPLOYER_ADDRESS --transactions-allow-list-enabled $DEPLOYER_ADDRESS 
 ```
+
+**Note**: After executing the above command kindly open the `genesis.json` file from your text editor. Within the `genesis > alloc` object update the balance of the deployer address to `0x56bc75e2d63100000`. This will premine 100 native Supernet tokens to the deployer's address.
 
 ## 5. Deploy StakeManager contract to Rootchain
 Next we deploy the StakeManager on the Rootchain
