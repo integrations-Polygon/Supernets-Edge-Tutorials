@@ -1,7 +1,7 @@
 # Setup Polygon Supernets v1.0.0 on Ubuntu 22
-Last Updated: Jul 21, 2023
-Release Version: 1.0.1
-Subrelease Version: Commit 72e2c4b
+Last Updated: Aug 2, 2023
+Release Version: 1.1.0
+Subrelease Version: Commit SHA 992d6b99420604d5a9faf2dca76f29812d727e6a
 
 ## Prequisites:
 - Golang 1.20
@@ -59,7 +59,7 @@ The `--native-token-config` file sets the attributes of the native token of the 
     --transactions-allow-list-admin $DEPLOYER_ADDRESS --transactions-allow-list-enabled $DEPLOYER_ADDRESS 
 ```
 
-**Note**: After executing the above command kindly open the `genesis.json` file from your text editor. Within the `genesis > alloc` object update the balance of the deployer address to `0x56bc75e2d63100000`. This will premine 100 native Supernet tokens to the deployer's address.
+**Note**: After executing the above command kindly open the `genesis.json` file from your text editor. Within the `genesis > alloc` object update the balance of the deployer address to `0x56bc75e2d63100000`. This will premine 100 native Supernet tokens to the deployer's address. You can fund the remaining validators similarly.
 
 ## 5. Deploy StakeManager contract to Rootchain
 Next we deploy the StakeManager on the Rootchain
