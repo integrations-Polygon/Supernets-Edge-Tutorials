@@ -1,7 +1,7 @@
 # Setup Polygon Supernets v1.1.0 on Ubuntu 22
-Last Updated: Aug 3, 2023
+Last Updated: Aug 21, 2023
 Release Version: 1.1.0
-Subrelease Version: Commit SHA 927f02fb0ba882c57caa0c4ee0aaaa39842f34dc
+Subrelease Version: Commit SHA 25e09c2fcc4083a302165d461082b4456a5f3634
 
 ## Prequisites:
 - Golang 1.20
@@ -47,19 +47,32 @@ To blocklist specific addresses from making transactions to your Supernet, you c
 
 The `--native-token-config` file sets the attributes of the native token of the Supernet. In case the minting flag inside the native token config is set to `true` inside the config, the minter's address needs to be supplied at the end.
 ```
-./polygon-edge genesis /
-    --block-gas-limit 10000000 --block-time 6s /
-    --chain-id 7567 --consensus polybft --epoch-size 10 /
-    --name my_supernet --native-token-config "SuperETH:SETH:18:true:$DEPLOYER_ADDRESS" /
-    --reward-wallet $DEPLOYER_ADDRESS:1000000 /
-    --premine 0x0:1 --premine $DEPLOYER_ADDRESS:100000000000000000000 /
-    --validators-path ./ --validators-prefix test-chain- /
-    --bridge-allow-list-admin $DEPLOYER_ADDRESS --bridge-allow-list-enabled $DEPLOYER_ADDRESS /
-    --contract-deployer-allow-list-admin $DEPLOYER_ADDRESS --contract-deployer-allow-list-enabled $DEPLOYER_ADDRESS /
-    --transactions-allow-list-admin $DEPLOYER_ADDRESS --transactions-allow-list-enabled $DEPLOYER_ADDRESS 
+./polygon-edge genesis --block-gas-limit 10000000 --block-time 6s --chain-id 7567 --consensus polybft --epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:true:$DEPLOYER_ADDRESS" --reward-wallet 0x1:1 --premine 0x0:1 --validators-path ./ --validators-prefix test-chain- --bridge-allow-list-admin $DEPLOYER_ADDRESS --bridge-allow-list-enabled $DEPLOYER_ADDRESS --contract-deployer-allow-list-admin $DEPLOYER_ADDRESS --contract-deployer-allow-list-enabled $DEPLOYER_ADDRESS --transactions-allow-list-admin $DEPLOYER_ADDRESS --transactions-allow-list-enabled $DEPLOYER_ADDRESS
 ```
 
-**Note**: After executing the above command kindly open the `genesis.json` file from your text editor. Within the `genesis > alloc` object update the balance of the deployer address to `0x56bc75e2d63100000`. This will premine 100 native Supernet tokens to the deployer's address. You can fund the remaining validators similarly.
+**Note**: After executing the above command kindly modify the `genesis.json` file with the following commands. This will update the `genesis > alloc` object and premine 100 native Supernet tokens to the deployer's address. You can fund the remaining validators similarly.
+```
+VALIDATOR_1=$(jq -r '.params.engine.polybft.initialValidatorSet[0].address' "genesis.json")
+VALIDATOR_2=$(jq -r '.params.engine.polybft.initialValidatorSet[1].address' "genesis.json")
+VALIDATOR_3=$(jq -r '.params.engine.polybft.initialValidatorSet[2].address' "genesis.json")
+VALIDATOR_4=$(jq -r '.params.engine.polybft.initialValidatorSet[3].address' "genesis.json")
+```
+```
+jq --arg key "$DEPLOYER_ADDRESS" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+```
+```
+jq --arg key "$VALIDATOR_1" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+```
+```
+jq --arg key "$VALIDATOR_2" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+```
+```
+jq --arg key "$VALIDATOR_3" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+```
+```
+jq --arg key "$VALIDATOR_4" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+```
+
 
 ## 5. Deploy StakeManager contract to Rootchain
 Next we deploy the StakeManager on the Rootchain
@@ -83,12 +96,7 @@ This command deploys rootchain smart contracts and initializes them. It also upd
 
 ## 7. Fund validators on Rootchain
 in order for validators to be able to send transactions to Ethereum, they need to be funded in order to be able to cover gas cost. This command is for testing purposes only. First we assign the shell variables for validator addresses.
-```
-VALIDATOR_1=$(jq -r '.params.engine.polybft.initialValidatorSet[0].address' "genesis.json")
-VALIDATOR_2=$(jq -r '.params.engine.polybft.initialValidatorSet[1].address' "genesis.json")
-VALIDATOR_3=$(jq -r '.params.engine.polybft.initialValidatorSet[2].address' "genesis.json")
-VALIDATOR_4=$(jq -r '.params.engine.polybft.initialValidatorSet[3].address' "genesis.json")
-```
+
 **Note**: 0.1ETH of native rootchain tokens will be transferred from the deployer's address to each of the validators. In case you wish to edit the funding amounts, refer the `--amounts` flag 
 ```
 ./polygon-edge rootchain fund --addresses $VALIDATOR_1,$VALIDATOR_2,$VALIDATOR_3,$VALIDATOR_4 --amounts 100000000000000000,100000000000000000,100000000000000000,100000000000000000 --json-rpc $ROOTCHAIN_RPC --private-key $DEPLOYER_KEY
