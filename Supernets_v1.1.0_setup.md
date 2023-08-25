@@ -47,7 +47,7 @@ To blocklist specific addresses from making transactions to your Supernet, you c
 
 The `--native-token-config` file sets the attributes of the native token of the Supernet. In case the minting flag inside the native token config is set to `true` inside the config, the minter's address needs to be supplied at the end.
 ```
-./polygon-edge genesis --block-gas-limit 10000000 --block-time 6s --chain-id 7567 --consensus polybft --epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:true:$DEPLOYER_ADDRESS" --reward-wallet 0x1:1 --premine 0x0:1 --validators-path ./ --validators-prefix test-chain- --bridge-allow-list-admin $DEPLOYER_ADDRESS --bridge-allow-list-enabled $DEPLOYER_ADDRESS --contract-deployer-allow-list-admin $DEPLOYER_ADDRESS --contract-deployer-allow-list-enabled $DEPLOYER_ADDRESS --transactions-allow-list-admin $DEPLOYER_ADDRESS --transactions-allow-list-enabled $DEPLOYER_ADDRESS
+./polygon-edge genesis --block-gas-limit 0 --block-time 6s --chain-id 7567 --consensus polybft --epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:true:$DEPLOYER_ADDRESS" --reward-wallet 0x1:1 --premine 0x0:1 --validators-path ./ --validators-prefix test-chain- --bridge-block-list-admin $DEPLOYER_ADDRESS --bridge-block-list-enabled 0x42 --contract-deployer-block-list-admin $DEPLOYER_ADDRESS --contract-deployer-block-list-enabled 0x42 --transactions-block-list-admin $DEPLOYER_ADDRESS --transactions-block-list-enabled 0x42
 ```
 
 **Note**: After executing the above command kindly modify the `genesis.json` file with the following commands. This will update the `genesis > alloc` object and premine 100 native Supernet tokens to the deployer's address. You can fund the remaining validators similarly.
