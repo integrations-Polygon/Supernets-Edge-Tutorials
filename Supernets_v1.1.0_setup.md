@@ -59,17 +59,13 @@ VALIDATOR_4=$(jq -r '.params.engine.polybft.initialValidatorSet[3].address' "gen
 ```
 ```
 jq --arg key "$DEPLOYER_ADDRESS" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
-```
-```
+
 jq --arg key "$VALIDATOR_1" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
-```
-```
+
 jq --arg key "$VALIDATOR_2" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
-```
-```
+
 jq --arg key "$VALIDATOR_3" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
-```
-```
+
 jq --arg key "$VALIDATOR_4" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
 ```
 
