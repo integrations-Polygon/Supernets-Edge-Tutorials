@@ -1,7 +1,5 @@
 # Deploy Supernet with Docker on Ubuntu 22.04
 
-This tutorial assumes PolyBFT consensus
-
 ## Prerequisites:
 - Docker & docker-compose [[Installation instructions](https://github.com/integrations-Polygon/Supernets-Edge-Tutorials/blob/master/Install_Docker.md)]
 - [Hardware Requirements](https://wiki.polygon.technology/docs/supernets/operate/supernets-requirements)
@@ -18,22 +16,22 @@ make download-submodules
 
 ## 3. Compile Contracts 
 ```
-cd core-contracts && npm install && npm run compile && cd -
-go run ./consensus/polybft/contractsapi/artifacts-gen/main.go
+cd core-contracts && npm install && npm run compile
+cd ../docker/local
 ```
 
 ## 4. Build and Run Containers
 ```
-export EDGE_CONSENSUS=polybft
-docker-compose -f ./docker/local/docker-compose.yml up -d --build
+docker-compose build
+docker-compose up -d
 ```
 
 ## 5. Stop / Destroy Containers
 Stop Containers
 ```
-docker-compose -f ./docker/local/docker-compose.yml stop
+docker-compose stop
 ```
 Destroy Environments
 ```
-docker-compose -f ./docker/local/docker-compose.yml down -v
+docker-compose down
 ```
