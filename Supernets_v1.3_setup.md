@@ -1,7 +1,7 @@
 # Setup Polygon Supernets v1.3 on Ubuntu 22
 This setup is for manual deployments for cases where an ERC20 Rootchain Token is mapped to the native Supernet Token.
 
-Last Updated: Oct 12, 2023
+Last Updated: Oct 20, 2023
 Release Version: 1.3
 Subrelease Version: Commit SHA c27d222
 
@@ -65,6 +65,11 @@ VALIDATOR_2=$(jq -r '.params.engine.polybft.initialValidatorSet[1].address' "gen
 VALIDATOR_3=$(jq -r '.params.engine.polybft.initialValidatorSet[2].address' "genesis.json")
 VALIDATOR_4=$(jq -r '.params.engine.polybft.initialValidatorSet[3].address' "genesis.json")
 ```
+
+**Note**: In case you'd like to prefund an account on your Supernet, you can use this shell command to assign some balance to any address you'd like. In this example we use `$DEPLOYER_ADDRESS`
+````
+jq --arg key "$DEPLOYER_ADDRESS" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+````
 
 ## 5. Deploy StakeManager contract to Rootchain
 Next we deploy the StakeManager on the Rootchain
