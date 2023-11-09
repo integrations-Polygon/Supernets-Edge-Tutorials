@@ -1,13 +1,12 @@
 # Setup Polygon Supernets v1.3 on Ubuntu 22
 This setup is for manual deployments for cases where an ERC20 Rootchain Token is mapped to the native Supernet Token.
 
-Last Updated: Oct 20, 2023
-Release Version: 1.3
-Subrelease Version: Commit SHA c27d222
+Last Updated: Nov 9, 2023
+Release Version: 1.3.2
+Subrelease Version: Commit SHA ab9b887
 
 ## Prequisites:
 - Golang 1.20
-- Docker
 
 ## 1. Clone and Build Supernets
 ```
@@ -37,6 +36,8 @@ The Rootchain Stake Token is an ERC20 that's deployed on the rootchain. This tok
 
 The Rootchain Parent Token is yet another ERC20 on the rootchain that acts as the parent token for the native token on the Supernet.
 
+The Reward Token Code is the byteCode for an ERC20 contract which will serve as Validator rewards on the Supernet if native Supernet token minting is set to false.
+
 The Proxy Contract Admin Address should be different from the Deployer's Address
 ```
 DEPLOYER_ADDRESS=<deployer_wallet_address>
@@ -45,6 +46,7 @@ ROOTCHAIN_RPC=<rootchain_rpc_here>
 ROOTCHAIN_STAKE_TOKEN=<stake_token_address_here>
 ROOTCHAIN_PARENT_TOKEN=<parent_token_address_here>
 PROXY_CONTRACT_ADMIN=<proxy_contract_admin_address_here>
+REWARD_TOKEN_CODE=<ERC20_contract_bytecode_here>
 ```
 
 ## 4. Initialize genesis file with allowlisting / blocklisting, premining, and native token config
@@ -56,7 +58,7 @@ To blocklist specific addresses from making transactions to your Supernet, you c
 
 The `--native-token-config` file sets the attributes of the native token of the Supernet. In case the minting flag inside the native token config is set to `true` inside the config, the minter's address needs to be supplied at the end.
 ```
-./polygon-edge genesis --block-gas-limit 0 --block-time 6s --chain-id 7567 --consensus polybft --epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:false" --reward-wallet 0x1:1 --premine 0x0:1 --validators-path ./ --validators-prefix test-chain- --bridge-block-list-admin $DEPLOYER_ADDRESS --bridge-block-list-enabled 0x42 --contract-deployer-block-list-admin $DEPLOYER_ADDRESS --contract-deployer-block-list-enabled 0x42 --transactions-block-list-admin $DEPLOYER_ADDRESS --transactions-block-list-enabled 0x42 --proxy-contracts-admin $PROXY_CONTRACT_ADMIN
+./polygon-edge genesis --block-gas-limit 0 --block-time 6s --chain-id 7567 --consensus polybft --epoch-size 10 --name my_supernet --native-token-config "SuperETH:SETH:18:false" --reward-wallet 0x1:1 --reward-token-code $REWARD_TOKEN_CODE --premine 0x0:1 --validators-path ./ --validators-prefix test-chain- --bridge-block-list-admin $DEPLOYER_ADDRESS --bridge-block-list-enabled 0x42 --contract-deployer-block-list-admin $DEPLOYER_ADDRESS --contract-deployer-block-list-enabled 0x42 --transactions-block-list-admin $DEPLOYER_ADDRESS --transactions-block-list-enabled 0x42 --proxy-contracts-admin $PROXY_CONTRACT_ADMIN
 ```
 
 ```
@@ -67,9 +69,21 @@ VALIDATOR_4=$(jq -r '.params.engine.polybft.initialValidatorSet[3].address' "gen
 ```
 
 **Note**: In case you'd like to prefund an account on your Supernet, you can use this shell command to assign some balance to any address you'd like. In this example we use `$DEPLOYER_ADDRESS`
-````
+```
 jq --arg key "$DEPLOYER_ADDRESS" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
-````
+```
+
+Similarly, we need to fund the validator addresses to ensure they have enough funds for bridging
+
+```
+jq --arg key "$VALIDATOR_1" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+
+jq --arg key "$VALIDATOR_2" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+
+jq --arg key "$VALIDATOR_3" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+
+jq --arg key "$VALIDATOR_4" '.genesis.alloc += { ($key): { "balance": "0x56bc75e2d63100000"  } }' genesis.json > temp.json && mv temp.json genesis.json
+```
 
 ## 5. Deploy StakeManager contract to Rootchain
 Next we deploy the StakeManager on the Rootchain
@@ -92,7 +106,7 @@ This command deploys rootchain smart contracts and initializes them. It also upd
 ```
 
 ## 7. Fund validators on Rootchain
-in order for validators to be able to send transactions to Ethereum, they need to be funded in order to be able to cover gas cost. This command is for testing purposes only. First we assign the shell variables for validator addresses.
+in order for validators to be able to send transactions to Ethereum, they need to be funded in order to be able to cover gas cost.
 
 **Note**: 0.1ETH of native rootchain tokens will be transferred from the deployer's address to each of the validators. In case you wish to edit the funding amounts, refer the `--amounts` flag 
 ```
